@@ -13,15 +13,15 @@ const personSchema = new Schema({
 
 const Person = mongoose.model('Person', personSchema);
 
-const createAndSavePerson = (done) => {
+const createAndSavePerson = async(done) => {
   let jane = new Person({ 
-    name: "jane",
+    name: "Jane",
     age: 18,
     favoriteFoods: ["Pizza", "Broccoli", "Edamame"]
   });
-  jane.save((err, data) => {
+  await jane.save((err, data) => {
     if (err) return console.error(err);
-    done(null, data);
+    return done(null, data);
   });
 };
 
