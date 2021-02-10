@@ -2,11 +2,16 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-try {
-  await mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
-} catch (error) {
-  console.error(error);
+// Connect to DB
+getConnection = async() => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
+  } catch (error) {
+    console.error('Initial connection error: ' + error);
+  }
 }
+
+getConnection();
 
 const personSchema = new Schema({
   name: { type: String, required: true },
