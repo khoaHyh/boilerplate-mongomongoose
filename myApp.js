@@ -2,17 +2,18 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-// Connect to DB
+/* 1. Install and Set Up Mongoose */
 getConnection = async() => {
   try {
     await mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true });
   } catch (error) {
-    console.error('Initial connection error: ' + error);
+    console.error(`Initial connection error: ${error}`);
   }
 }
 
 getConnection();
 
+/* 2. Create a Model */
 const personSchema = new Schema({
   name: { type: String, required: true },
   age: Number,
@@ -21,6 +22,13 @@ const personSchema = new Schema({
 
 const Person = mongoose.model('Person', personSchema);
 
+/* 3. Create and Save a Record of a Model 
+  Fixed initial connection to db errors by removing quotes
+  from Heroku config vars. In our local .env file we leave
+  the quotes but something about Heroku causes errors when
+  we surround the MONGO_URI var with quotes.
+*/
+
 const createAndSavePerson = (done) => {
   let jane = new Person({ 
     name: "Jane",
@@ -28,13 +36,23 @@ const createAndSavePerson = (done) => {
     favoriteFoods: ["Pizza", "Broccoli", "Edamame"]
   });
   jane.save((err, data) => {
-    if (err) return console.error(err);
-    return done(null, data);
+    if (err) return console.error(`createAndSavePerson error: ${err}`);
+    done(null, data);
   });
 };
 
+/* 4. Create Many Records with model.create() */
+let arrayOfPeople = [
+  { name: "Mark", age: 34, favoriteFoods: ["Ice Cream", "Tofu"] },
+  { name: "Foo", age: 21, favoriteFoods: ["Donuts"] },
+  { name: "Felicity", age: 25, favoriteFoods: ["Bagels", "Cheeseburgers", "French Fries"] }
+]
+
 const createManyPeople = (arrayOfPeople, done) => {
-  done(null /*, data*/);
+  Person.create(arrayOfPeople, (err, doc) => {
+    if (err) return console.error(`createManyPeople error: ${err}`);
+    done(null, doc);
+  });
 };
 
 const findPeopleByName = (personName, done) => {
